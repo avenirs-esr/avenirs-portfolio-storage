@@ -1,8 +1,8 @@
 \connect template1;
 
-DROP DATABASE avenirs_access_control;
-DROP ROLE avenirs_security_admin;
-DROP ROLE avenirs_security_admin_role;
+DROP DATABASE IF EXISTS avenirs_access_control;
+DROP ROLE  IF EXISTS  avenirs_security_admin;
+DROP ROLE  IF EXISTS avenirs_security_admin_role;
 
 CREATE ROLE avenirs_security_admin_role SUPERUSER; 
 CREATE ROLE avenirs_security_admin PASSWORD 'S33c@DM4avn' NOSUPERUSER CREATEDB CREATEROLE INHERIT LOGIN;
