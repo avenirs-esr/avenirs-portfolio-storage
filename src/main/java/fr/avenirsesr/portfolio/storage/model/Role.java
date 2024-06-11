@@ -7,9 +7,9 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+@Data
 @Entity
 @Table(name="role")
-@Data
 public class Role {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,9 +20,16 @@ public class Role {
 
 	public Role() {
 	}
+	
 	public Role(long id, String name, String description) {
 		this.id = id;
 		this.name = name;
 		this.description = description;
 	}
+
+	@Override
+	public String toString() {
+		return "Role [id=" + id + ", name=" + name + ", description=" + description + "]";
+	}
+	
 }
