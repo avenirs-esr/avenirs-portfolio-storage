@@ -17,7 +17,7 @@ GRANT ALL PRIVILEGES ON DATABASE avenirs_access_control TO avenirs_security_admi
 
 CREATE TABLE role(
 	id serial,
-	name VARCHAR(80) NOT NULL,
+	name VARCHAR(80) UNIQUE NOT NULL,
 	description VARCHAR(255),
 	
 	CONSTRAINT role_pk PRIMARY KEY(id)
@@ -26,7 +26,7 @@ ALTER TABLE role OWNER TO avenirs_security_admin_role;
 
 CREATE TABLE permission(
 	id serial,
-	name VARCHAR(80) NOT NULL,
+	name VARCHAR(80) UNIQUE NOT NULL,
 	description VARCHAR(255),
 	
 	CONSTRAINT permission_pk PRIMARY KEY(id)
