@@ -59,7 +59,7 @@ replay_pid*
 
 # Temp files
 *~
-#*
+\#*
 
 # Node & npm
 node_modules
