@@ -15,6 +15,20 @@ GRANT ALL PRIVILEGES ON DATABASE avenirs_access_control TO avenirs_security_admi
 
 \connect avenirs_access_control
 
+-- Mock table
+CREATE TABLE user_mock(
+	id serial,
+	user_login VARCHAR(80) NOT NULL,
+	username VARCHAR(80) NOT NULL,
+	CONSTRAINT user_mock_pk PRIMARY KEY(id)
+);
+ALTER TABLE user_mock OWNER TO avenirs_security_admin_role;
+-- End of mock
+
+
+
+
+
 CREATE TABLE role(
 	id serial,
 	name VARCHAR(80) UNIQUE NOT NULL,
@@ -43,16 +57,48 @@ CREATE TABLE action(
 ALTER TABLE action OWNER TO avenirs_security_admin_role;
 
 
--- The resources field is used to determine the linked resources, this is a first
--- step.  To be improved.
+CREATE TABLE resource_type(
+	id serial,
+	name VARCHAR(80) NOT NULL,
+	description VARCHAR(255),
+	CONSTRAINT resource_typ_pk PRIMARY KEY(id)
+);
+ALTER TABLE resource_type OWNER TO avenirs_security_admin_role;
+
+
+CREATE TABLE resource(
+	id serial,
+	selector VARCHAR(255),
+	id_resource_type INTEGER NOT NULL, 
+	CONSTRAINT resource_pk PRIMARY KEY(id)
+);
+ALTER TABLE resource OWNER TO avenirs_security_admin_role;
+
+ALTER TABLE resource ADD CONSTRAINT resource_id_resource_type_fk FOREIGN KEY(id_resource_type)
+REFERENCES resource_type(id) MATCH FULL
+ON DELETE CASCADE NOT DEFERRABLE;
+
 CREATE TABLE scope(
 	id serial,
 	name VARCHAR(80),
-	description VARCHAR(255),
-	resources TEXT NOT NULL,
 	CONSTRAINT scope_pk PRIMARY KEY(id)
 );
 ALTER TABLE scope OWNER TO avenirs_security_admin_role;
+
+CREATE TABLE scope_resource(
+	id_scope INTEGER NOT NULL,
+	id_resource INTEGER NOT NULL,
+	CONSTRAINT scope_resource_pk PRIMARY KEY(id_scope, id_resource)
+);
+ALTER TABLE scope_resource OWNER TO avenirs_security_admin_role;
+
+ALTER TABLE scope_resource ADD CONSTRAINT scope_resource_id_scope_fk FOREIGN KEY(id_scope)
+REFERENCES scope(id) MATCH FULL
+ON DELETE CASCADE NOT DEFERRABLE;
+
+ALTER TABLE scope_resource ADD CONSTRAINT scope_resource_id_resource_fk FOREIGN KEY(id_resource)
+REFERENCES resource(id) MATCH FULL
+ON DELETE CASCADE NOT DEFERRABLE;
 
 CREATE TABLE context(
 	id serial,
@@ -97,12 +143,16 @@ ON DELETE CASCADE NOT DEFERRABLE;
 
 CREATE TABLE role_assignment(
 	id_role INTEGER,
-	id_user VARCHAR(40) NOT NULL,
+	id_user INTEGER,
 	id_scope INTEGER,
 	id_context INTEGER,
 	CONSTRAINT role_assignment_pk PRIMARY KEY(id_role, id_user, id_scope, id_context)
 );
 ALTER TABLE role_assignment OWNER TO avenirs_security_admin_role;
+
+ALTER TABLE role_assignment ADD CONSTRAINT role_assignment_id_user_fk FOREIGN KEY(id_user)
+REFERENCES user_mock(id) MATCH FULL
+ON DELETE CASCADE NOT DEFERRABLE;
 
 ALTER TABLE role_assignment ADD CONSTRAINT role_assignment_id_role_fk FOREIGN KEY(id_role)
 REFERENCES role(id) MATCH FULL
@@ -114,10 +164,6 @@ ON DELETE CASCADE NOT DEFERRABLE;
 
 ALTER TABLE role_assignment ADD CONSTRAINT role_assignment_id_context_fk FOREIGN KEY(id_context)
 REFERENCES context(id) MATCH FULL
-ON DELETE CASCADE NOT DEFERRABLE;
-
-ALTER TABLE role_assignment ADD CONSTRAINT role_assignment_id_user_fk FOREIGN KEY(id_role)
-REFERENCES role(id) MATCH FULL
 ON DELETE CASCADE NOT DEFERRABLE;
 
 -- The user deletion will have to be processed

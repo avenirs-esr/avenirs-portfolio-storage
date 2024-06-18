@@ -4,6 +4,9 @@
 DELETE FROM role;
 DELETE FROM permission;
 DELETE FROM action;
+DELETE FROM resource_type;
+DELETE FROM resource;
+DELETE FROM scope;
 
 INSERT INTO role (name, description) 
 VALUES 
@@ -50,4 +53,23 @@ VALUES
 ((SELECT id FROM role WHERE role.name = 'ROLE_CONTRIBUTOR'), (SELECT id FROM permission WHERE permission.name = 'PERM_WRITE'));
 
 
+INSERT INTO resource_type (name, description)
+VALUES 
+('PORTFOLIO', 'Resource of type portfolio'),
+('SAE', 'Resource of type SAE');
 
+
+INSERT INTO resource (selector, id_resource_type)
+VALUES 
+('ptf_0000', (SELECT id FROM resource_type WHERE resource_type.name = 'PORTFOLIO')),
+('sae_0001', (SELECT id FROM resource_type WHERE resource_type.name = 'SAE'));
+
+
+INSERT INTO scope (name)
+VALUES 
+('internal:pf:owner');
+
+
+INSERT INTO scope_resource (id_scope, id_resource)
+VALUES 
+((SELECT id FROM scope WHERE name = 'internal:pf:owner'), (SELECT id FROM resource WHERE selector = 'ptf_0000'));
